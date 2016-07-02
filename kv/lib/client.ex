@@ -60,7 +60,7 @@ use GenServer
 
   #GET
   def handle_cast({:get, key},{currentserver, tail}) do
-        HTTPotion.get(currentserver <> "/", query: %{key: key})
+        HTTPotion.get(currentserver <> "/get", query: %{key: key})
         |> Map.get(:body)
         |> ok
    end
