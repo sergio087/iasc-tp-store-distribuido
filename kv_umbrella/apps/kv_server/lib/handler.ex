@@ -1,4 +1,4 @@
-defmodule MyRouter do
+defmodule KVServer.Handler do
   use Plug.Router
 
   plug Plug.Logger
