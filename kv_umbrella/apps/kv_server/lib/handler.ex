@@ -8,7 +8,13 @@ defmodule KVServer.Handler do
   plug :match
   plug :dispatch
 
-  get "/get" do
+
+  def init(options) do
+    IO.puts inspect options
+    options
+  end
+
+  match "/get", via: :get do
     IO.puts inspect conn
     IO.puts "\n#{conn.query_string}\n"
     send_resp(conn, 200, "get")
@@ -21,9 +27,9 @@ defmodule KVServer.Handler do
 
   end
 
-  get "/find" do
+  match "/find", via: :get do
     IO.puts inspect conn
-    send_resp(conn, 200, "world")
+    send_resp(conn, 200, "find")
   end
 
   match _ do
