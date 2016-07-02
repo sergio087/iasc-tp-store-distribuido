@@ -3,4 +3,5 @@
   "httpotion": {:hex, :httpotion, "3.0.0", "4ce0af28f4254bdd0457d0fe065a83787751e0a5b5f5d27030948253be38df5c", [:mix], [{:ibrowse, "~> 4.2", [hex: :ibrowse, optional: false]}]},
   "ibrowse": {:hex, :ibrowse, "4.2.2", "b32b5bafcc77b7277eff030ed32e1acc3f610c64e9f6aea19822abcadf681b4b", [:rebar3], []},
   "plug": {:hex, :plug, "1.1.6", "8927e4028433fcb859e000b9389ee9c37c80eb28378eeeea31b0273350bf668b", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, optional: true]}]},
+  "poison": {:hex, :poison, "1.4.0", "cd5afb9db7f0d19487572fa28185b6d4de647f14235746824e77b3139b79b725", [:mix], []},
   "ranch": {:hex, :ranch, "1.2.1", "a6fb992c10f2187b46ffd17ce398ddf8a54f691b81768f9ef5f461ea7e28c762", [:make], []}}

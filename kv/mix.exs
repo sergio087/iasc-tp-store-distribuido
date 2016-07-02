@@ -14,7 +14,7 @@ defmodule KV.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :cowboy, :plug, :httpotion]]
+    [applications: [:logger, :cowboy, :plug, :poison, :httpotion]]
   end
 
   # Dependencies can be Hex packages:
@@ -29,6 +29,7 @@ defmodule KV.Mixfile do
   defp deps do
     [{:cowboy, "~> 1.0.0"},
      {:plug, "~> 1.0"},
-    {:httpotion, "~> 3.0.0"}]
+     {:poison, "~> 1.4.0"},
+     {:httpotion, "~> 3.0.0"}]
   end
 end
