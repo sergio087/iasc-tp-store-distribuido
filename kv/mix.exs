@@ -31,5 +31,6 @@ defmodule KV.Mixfile do
      {:plug, "~> 1.0"},
      {:poison, "~> 1.4.0"},
      {:httpotion, "~> 3.0.0"}]
+    ]
   end
 end
