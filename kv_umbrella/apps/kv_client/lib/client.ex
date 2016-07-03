@@ -24,7 +24,7 @@ use GenServer
 
     def init(:ok) do 
         IO.puts "init"
-        [currentserver | tail] = Application.get_env(:kv, :server1)
+        [currentserver | tail] = Application.get_env(:kv_client, :server1)
         {:ok, {currentserver, tail}}
     end
 

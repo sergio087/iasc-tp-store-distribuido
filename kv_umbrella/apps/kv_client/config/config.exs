@@ -12,6 +12,11 @@ use Mix.Config
 #
 #     config :kv_client, key: :value
 #
+
+config :kv_client, 
+	server1: ["http://localhost:4000", "http://localhost:5000", "http://localhost:6000"],
+	server2: "value2"
+
 # And access this configuration in your application as:
 #
 #     Application.get_env(:kv_client, :key)
