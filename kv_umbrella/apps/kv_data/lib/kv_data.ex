@@ -1,5 +1,5 @@
-defmodule KVServer do
-  use Application
+defmodule KVData do
+	use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -9,14 +9,12 @@ defmodule KVServer do
     children = [
       # Define workers and child supervisors to be supervised
       # worker(KVServer.Worker, [arg1, arg2, arg3]),
-      worker(__MODULE__.Handler, []),
-      worker(__MODULE__.Resolver, [[name: :resolver]])
+      worker(__MODULE__.Store, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: KVServer.Supervisor]
+    opts = [strategy: :one_for_one, name: KVData.Supervisor]
     Supervisor.start_link(children, opts)
   end
-
 end

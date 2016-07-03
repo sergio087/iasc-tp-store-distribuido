@@ -10,15 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :kv_server, key: :value
+#     config :kv_data, key: :value
 #
-
-config :kv_server,
-	dataStores: [:"data1@127.0.0.1", :"data2@127.0.0.1"]
-
 # And access this configuration in your application as:
 #
-#     Application.get_env(:kv_server, :key)
+#     Application.get_env(:kv_data, :key)
 #
 # Or configure a 3rd-party app:
 #
