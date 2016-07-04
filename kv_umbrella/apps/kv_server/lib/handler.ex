@@ -1,3 +1,42 @@
+defmodule KVServer.Initializer do
+
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, :ok, opts )
+  end
+
+   def start(opts \\ []) do
+    GenServer.start(__MODULE__, :ok, opts)
+  end
+
+  
+  def init(:ok) do
+    [currentport | tail] = Application.get_env(:kv_server, :ports)
+    IO.puts "INICIALIZANDO"
+    startServer({currentport, tail})
+  end
+
+  def startServer({currentport, tail}) do 
+    case Plug.Adapters.Cowboy.http KVServer.Handler, [], [ip: {127,0,0,1}, port: currentport] do
+        {:ok, pid} ->
+            IO.puts "OK"
+            IO.puts currentport
+            {:ok, pid}
+        {:error, _} ->
+            IO.puts "ERROR"
+          startServer(changePort({currentport, tail}))
+    end
+      
+  end
+
+  def changePort({currentport, tail}) do
+    tail = List.insert_at(tail, -1, currentport)
+    [currentport | tail ] = tail
+    {currentport, tail}
+  end
+
+end
+
+
 defmodule KVServer.Handler do
   use Plug.Router
 
@@ -7,11 +46,6 @@ defmodule KVServer.Handler do
                    json_decoder: Poison
   plug :match
   plug :dispatch
-
-
-  def start_link do
-    { :ok, _ } = Plug.Adapters.Cowboy.http KVServer.Handler, [], [ip: {127,0,0,1}, port: 4000]
-  end
 
 
   def init(options) do
@@ -45,7 +79,7 @@ defmodule KVServer.Handler do
   end
 
   match _ do
-    IO.puts inspect conn
+    IO.puts "hola"
     send_resp(conn, 404, "oops")
   end
 end

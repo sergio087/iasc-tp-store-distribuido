@@ -14,7 +14,9 @@ use Mix.Config
 #
 
 config :kv_server,
-	dataStores: [:"data1@127.0.0.1", :"data2@127.0.0.1"]
+	dataStores: [:"data1@127.0.0.1", :"data2@127.0.0.1"],
+	ports: [4000, 5000, 4500]
+	
 
 # And access this configuration in your application as:
 #
