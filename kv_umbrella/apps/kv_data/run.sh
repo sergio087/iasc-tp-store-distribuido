@@ -5,4 +5,4 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-iex --name ${1}@127.0.0.1 -S mix
+iex --name "${1}@127.0.0.1" -S mix
