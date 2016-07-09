@@ -2,7 +2,7 @@ defmodule KVServer.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :kv_server,
+    [app: :orchestrator,
      version: "0.0.1",
      build_path: "../../_build",
      config_path: "../../config/config.exs",
