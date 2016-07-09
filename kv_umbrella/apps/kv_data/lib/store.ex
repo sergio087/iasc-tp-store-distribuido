@@ -56,7 +56,6 @@ defmodule KVData.Store do
   end
 
   def handle_call({:insert, key, value}, _from, state) do
-    #TODO validar capacidad maxima de claves a guardar
     if checkFreeSpace(state) do
   	  {:reply, :ok, %__MODULE__{dictionary: Map.put(state.dictionary, key, value), max_size: state.max_size}}
     else
