@@ -58,8 +58,8 @@ defmodule KVServer.Resolver do
 		tasks_with_results = Task.yield_many(tasks, 10000)
 
 		results = Enum.map(tasks_with_results, fn {task, res} -> res || Task.shutdown(task, :brutal_kill) end)
-
-  	{:reply, (List.flatten results), state}
+    IO.puts "\n#{inspect results}"
+  	{:reply, (List.flatten(Enum.flat_map results, fn({x, y}) -> y end)), state}
   end
 
   def handle_call({:resolveSet, key, value}, _from, {dataStores, index} = state) do

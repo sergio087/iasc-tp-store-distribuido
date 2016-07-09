@@ -10,11 +10,11 @@ defmodule KVData.Store do
 	end
 
   def find(:gt, value) do
-    GenServer.call :store, {:find, fn x -> x > value end}
+    GenServer.call :store, {:find, fn x -> value > x end}
   end
 
   def find(:lt, value) do
-    GenServer.call :store, {:find, fn x -> x < value end}
+    GenServer.call :store, {:find, fn x -> value < x end}
   end
 
 	def insert(key, value) do

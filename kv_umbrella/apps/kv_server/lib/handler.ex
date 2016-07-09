@@ -66,16 +66,33 @@ defmodule KVServer.Handler do
     IO.puts inspect conn
     IO.puts inspect conn.body_params
 
-    result = GenServer.call(:resolver, {:resolveSet, conn.body_params["key"], conn.body_params["value"]})
+    result = 
+      GenServer.call(
+        :resolver, 
+        {
+          :resolveSet, 
+          conn.body_params["key"], 
+          conn.body_params["value"]
+        }
+      )
     IO.puts inspect result
     send_resp(conn, 200, Poison.encode! result)
   end
 
   match "/find", via: :get do
     IO.puts inspect conn
-    IO.puts inspect conn.query_params
+    result = 
+      GenServer.call(
+        :resolver, 
+        {
+          :resolveFind, 
+          String.to_atom(conn.query_params["operator"]), 
+          conn.query_params["value"]
+        }
+      )
 
-    send_resp(conn, 200, "find")
+    IO.puts inspect result
+    send_resp(conn, 200, Poison.encode! result)
   end
 
   match _ do
