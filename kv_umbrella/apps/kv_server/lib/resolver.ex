@@ -1,6 +1,8 @@
 defmodule KVServer.Resolver do
   use GenServer
 
+  defstruct dataStores: [], max_key_length: 0 
+
   ## Client API
 
   def start_link(name \\ nil) do
@@ -21,12 +23,13 @@ defmodule KVServer.Resolver do
   	:rpc.call dataStore, KVData.Store, :insert, [key, value]
   end
 
-  defp nextStore(dataStores, currentIndex) do
-  	if currentIndex < length dataStores do
-			currentIndex + 1 
-		else
-			0
-  	end
+  defp nextStore(state, key) do
+    index = rem (Integer.undigits (:binary.bin_to_list key), 2), length state.dataStores
+    Enum.at state.dataStores, index
+  end
+
+  defp checkKeyLength(state,key) do
+    (byte_size key) <= state.max_key_length
   end
 
 
@@ -34,26 +37,32 @@ defmodule KVServer.Resolver do
 
   def init(:ok) do
     IO.puts ">>>> inicializa :resolver"
-    {:ok, {Application.get_env(:kv_server, :dataStores), 0} }
+    state = %__MODULE__{dataStores: Application.get_env(:kv_server, :dataStores), max_key_length: Application.get_env(:kv_server, :max_key_length)}
+    IO.puts inspect state
+    {:ok, state }
   end
 
-  def handle_call({:resolveGet, key}, _from, {dataStores, _index} = state) do
+  def handle_call({:resolveGet, key}, _from, state) do
     #TODO aplicar hash para saber donde buscar
-    dataStore = Enum.at dataStores, 0
     response =
-      case readOnStore(dataStore, :get, key) do
-        {:found, result} -> 
-          %{:status => "ok", :detail => result}
-        :not_found ->
-          %{:status => "error", :detail => "key not found"}
-      end
+      if checkKeyLength(state,key) do 
+        dataStore = nextStore state, key
+        case readOnStore(dataStore, :get, key) do
+          {:found, result} -> 
+            %{:status => "ok", :detail => result}
+          :not_found ->
+            %{:status => "error", :detail => "key not found"}
+        end
+      else
+        %{:status => "error", :detail => "key too long"}
+      end 
     {:reply, response, state}
   end
 
-  def handle_call({:resolveFind, operator, value}, _from, {dataStores, _index} = state) do
+  def handle_call({:resolveFind, operator, value}, _from, state) do
   	tasks = 
-			for i <- 0..(length dataStores) - 1 do
-				Task.async(fn -> readOnStore(Enum.at(dataStores, i), :find, operator, value) end)
+			for i <- 0..(length state.dataStores) - 1 do
+				Task.async(fn -> readOnStore(Enum.at(state.dataStores, i), :find, operator, value) end)
 			end
 
 		tasks_with_results = Task.yield_many(tasks, 10000)
@@ -63,19 +72,21 @@ defmodule KVServer.Resolver do
   	{:reply, (List.flatten(Enum.flat_map results, fn({x, y}) -> y end)), state}
   end
 
-  def handle_call({:resolveSet, key, value}, _from, {dataStores, index} = state) do
-  	#TODO aplicar hash para saber donde guardar
-  	#new_index = nextStore(dataStores, index)
-    new_index = 0
+  def handle_call({:resolveSet, key, value}, _from, state) do
     response =
-    	case writeOnStore(Enum.at(dataStores, new_index), key, value) do
-        :ok ->
-          %{:status => "ok"}
-        :not_enough_space ->
-          %{:status => "error", :detail => "the store is full"}
+      if checkKeyLength(state,key) do
+        dataStore = nextStore state, key
+        	case writeOnStore(dataStore, key, value) do
+            :ok ->
+              %{:status => "ok"}
+            :not_enough_space ->
+              %{:status => "error", :detail => "the store is full"}
+          end    	
+      else
+         %{:status => "error", :detail => "key too long"}
       end
-  	
-    {:reply, response, {dataStores, new_index}}
+
+    {:reply, response, state}
   end
 
   def handle_info(_unknownmsg, state) do
