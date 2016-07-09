@@ -8,18 +8,34 @@ defmodule KVServer.Initializer do
     GenServer.start(__MODULE__, :ok, opts)
   end
 
-  
+  def stop do
+    IO.puts "STOPINGGGGG"
+
+  end
+
+    def stop(server) do
+      GenServer.call server, :stop
+    end
+
+
+
+  ## Callbacks
+
   def init(:ok) do
     [currentport | tail] = Application.get_env(:kv_server, :ports)
     IO.puts "INICIALIZANDO"
     startServer({currentport, tail})
   end
 
+  def handle_call(:stop, _from, state) do
+    Plug.Adapters.Cowboy.shutdown KVServer.Handler.HTTP
+    {:stop, :normal, state}
+  end
+
   def startServer({currentport, tail}) do 
-    case Plug.Adapters.Cowboy.http KVServer.Handler, [], [ip: {127,0,0,1}, port: currentport] do
+    case Plug.Adapters.Cowboy.http KVServer.Handler, [], [port: currentport] do
         {:ok, pid} ->
-            IO.puts "OK"
-            IO.puts currentport
+            IO.puts "Inicializado orchestrator en puerto: #{currentport}"
             {:ok, pid}
         {:error, _} ->
             IO.puts "ERROR"
