@@ -5,8 +5,13 @@ defmodule KVServer.Resolver do
 
   ## Client API
 
-  def start_link(name \\ nil) do
-    GenServer.start_link(__MODULE__, :ok, [name: :resolver])
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, :ok, opts)
+  end
+
+
+  def set_rpc(key, value) do 
+    GenServer.call(:resolver, {:resolveSet, key, value})
   end
 
 

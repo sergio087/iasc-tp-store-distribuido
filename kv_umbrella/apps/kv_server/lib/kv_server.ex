@@ -11,8 +11,7 @@ defmodule KVServer do
       
       # Define workers and child supervisors to be supervised
       # worker(KVServer.Worker, [arg1, arg2, arg3]),
-      worker(__MODULE__.Initializer, [[name: :orchestrator]], restart: :transient),
-      worker(__MODULE__.Resolver, [[name: :resolver]])
+      worker(__MODULE__.Resolver, [[name: :resolver]], restart: :transient)
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

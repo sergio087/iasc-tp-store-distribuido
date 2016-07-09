@@ -8,56 +8,18 @@ defmodule KVServer.Initializer do
     GenServer.start(__MODULE__, :ok, opts)
   end
 
-  def stop do
-    IO.puts "STOPINGGGGG"
-
-  end
-
-    def stop(server) do
+  def stop(server) do
       GenServer.call server, :stop
-    end
+  end
 
 
 
   ## Callbacks
 
   def init(:ok) do
-    [currentport | tail] = Application.get_env(:kv_server, :ports)
-    IO.puts "INICIALIZANDO"
-    startServer({currentport, tail})
-   # receive do
+
   end
 
-  def handle_cast(:stop, _from, state) do
-    IO.puts "LLAMO STOP"
-    Plug.Adapters.Cowboy.shutdown KVServer.Handler.HTTP
-    {:stop, :normal, state}
-  end
-
-  def terminate(_,_) do
-    IO.puts "TERMINATE" 
-  end
-
-  def startServer({currentport, tail}) do 
-    case Plug.Adapters.Cowboy.http KVServer.Handler, [], [port: currentport] do
-        {:ok, pid} ->
-            IO.puts "Inicializado orchestrator en puerto: #{currentport}"
-            Process.link(pid)
-            {:ok, pid}
-        {:error, _} ->
-            IO.puts "ERROR"
-          startServer(changePort({currentport, tail}))
-    end
-      
-  end
-
-  def changePort({currentport, tail}) do
-    tail = List.insert_at(tail, -1, currentport)
-    [currentport | tail ] = tail
-    {currentport, tail}
-  end
-
-end
 
 
 defmodule KVServer.Handler do
@@ -75,6 +37,10 @@ defmodule KVServer.Handler do
     IO.puts inspect options
     options
   end
+
+  def terminate(_, _) do 
+    IO.puts "TEMINANDO"  
+ end
 
   match "/get", via: :get do
     IO.puts inspect conn
