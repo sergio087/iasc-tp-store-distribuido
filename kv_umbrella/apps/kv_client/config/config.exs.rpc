@@ -14,7 +14,7 @@ use Mix.Config
 #
 
 config :kv_client, 
-	servers: ["http://127.0.0.1:4005", "http://127.0.0.1:5000", "http://127.0.0.1:6000"]
+	servers: [:"orchestrator1@127.0.0.1", :"orchestrator2@127.0.0.1", :"orchestrator3@127.0.0.1"]
 
 
 # And access this configuration in your application as:

@@ -3,10 +3,6 @@ use GenServer
 
   ## Client API
 
-  @doc """
-  Starts the registry.
-  """
-
   def start_link do
     GenServer.start_link(__MODULE__, :ok, name: :client)
   end
@@ -35,7 +31,13 @@ use GenServer
       GenServer.call server, {:remove_rpc, key}
   end
 
+  #TODO Remove
+
   #### HTTP API
+
+  def set_HTTP(server, key, value) do
+      GenServer.call server, {:set, key, value}
+  end
 
   def get_HTTP(server, key) do
       GenServer.call server, {:get, key}
@@ -48,6 +50,8 @@ use GenServer
   def findSmaller_HTTP(server, value) do
       GenServer.call server, {:find, "lt", value}
   end
+
+  #TODO Remove
 
   defp changeserver([ currentServer | otherservers] = state) do
     List.flatten( otherservers, [currentServer])
@@ -62,6 +66,7 @@ use GenServer
   end
 
 
+  ################################      RPC       #######################################
      
   #Set
   def handle_call({:set_rpc, key, value},_from, [currentserver | _otherServers] = state) do
@@ -75,8 +80,7 @@ use GenServer
     
   end
   
- 
-   #Get
+  #Get
   def handle_call({:get_rpc, key, value}, _from, [currentserver | _otherServers] = state) do
     IO.puts currentserver
     case :rpc.call currentserver, KVServer.Resolver, :get_rpc, [key] do
@@ -124,18 +128,16 @@ use GenServer
     
   end
   
+  #TODO Remove
  
-  ##################################################################################
+  ################################      HTTP       #######################################
 
-
-
-  #OLD HTTP
   def handle_call({:getcurrentserver}, _from, [currentserver | _otherServers] = state) do
     {:reply, {:ok, currentserver}, state}
   end
 
   #SET
-  def handle_call({:set, key, value},_from, [currentserver | _otherServers] = state) do
+  def handle_call({:set, key, value}, _from, [currentserver | _otherServers] = state) do
     url = currentserver <>"/set"
     options =
       [
@@ -144,8 +146,12 @@ use GenServer
       ]
 
     response = HTTPotion.post url, options
-    #TODO verificar errores de conexion
-    {:reply, Map.get(response, :body), state}
+
+    if HTTPotion.Response.success? response do
+      {:reply, Map.get(response, :body), state}
+    else
+      {:reply, response, changeserver(state)}
+    end
   end
 
   #GET
@@ -155,8 +161,11 @@ use GenServer
     
     response = HTTPotion.get(url, options)
 
-    #TODO verificar errores de conexion
-    {:reply, Map.get(response, :body), state}
+    if HTTPotion.Response.success? response do
+      {:reply, Map.get(response, :body), state}
+    else
+      {:reply, response, changeserver(state)}
+    end
    end
 
    #FIND
@@ -166,12 +175,12 @@ use GenServer
     
         response = HTTPotion.get(url, options)
 
-    #TODO verificar errores de conexion
-    {:reply, Map.get(response, :body), state}
+    if HTTPotion.Response.success? response do
+      {:reply, Map.get(response, :body), state}
+    else
+      {:reply, response, changeserver(state)}
+    end
    end
 
-
-
-  
-   
+   #TODO Remove
 end

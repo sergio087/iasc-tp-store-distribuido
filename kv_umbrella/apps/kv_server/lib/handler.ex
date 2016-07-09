@@ -1,27 +1,3 @@
-defmodule KVServer.Initializer do
-
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts )
-  end
-
-   def start(opts \\ []) do
-    GenServer.start(__MODULE__, :ok, opts)
-  end
-
-  def stop(server) do
-      GenServer.call server, :stop
-  end
-
-
-
-  ## Callbacks
-
-  def init(:ok) do
-
-  end
-
-
-
 defmodule KVServer.Handler do
   use Plug.Router
 
@@ -32,8 +8,16 @@ defmodule KVServer.Handler do
   plug :match
   plug :dispatch
 
+  # def start_link do
+  #   ip_tuple = :application.get_env :orchestrator, :ip
+  #   {:ok, port} = :application.get_env :orchestrator, :port
+  #   IO.puts "#{inspect ip_tuple} : #{inspect port}"
+  #   ##{ :ok, _} = Plug.Adapters.Cowboy.http __MODULE__, [], [ip: ip_tuple, port: port]
+  #   Plug.Adapters.Cowboy.child_spec(:http, __MODULE__, [], [ip: ip_tuple, port: port])
+  # end
 
   def init(options) do
+    IO.puts ">>>> inicializa :handler"
     IO.puts inspect options
     options
   end
