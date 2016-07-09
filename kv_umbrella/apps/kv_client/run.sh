@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 1 ]; then
-	echo "Parameter Error! Use: ./run.sh data_name"
+	echo "Parameter Error! Use: ./run.sh client_name"
 	exit 1
 fi
 

@@ -14,8 +14,7 @@ use Mix.Config
 #
 
 config :kv_client, 
-	server1: ["http://127.0.0.1:4000", "http://127.0.0.1:4500", "http://127.0.0.1:5000"],
-	server2: "value2"
+	servers: ["http://127.0.0.1:4000", "http://127.0.0.1:4500", "http://127.0.0.1:5000"]
 
 # And access this configuration in your application as:
 #
