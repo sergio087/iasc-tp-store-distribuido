@@ -24,7 +24,7 @@ defmodule KVData.Store do
   ## Server Callbacks
 
   def init(:ok) do
-  	IO.puts "******** inicializa store *********"
+  	IO.puts ">>>> inicializa :store"
   	{:ok, %{}}
   end
 

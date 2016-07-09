@@ -34,7 +34,7 @@ use GenServer
   ## Server Callback
 
   def init(:ok) do 
-      IO.puts "init"
+      IO.puts ">>>> inicializa :client"
       [currentserver | otherServers] = Application.get_env(:kv_client, :servers)
       {:ok, [currentserver | otherServers]}
   end

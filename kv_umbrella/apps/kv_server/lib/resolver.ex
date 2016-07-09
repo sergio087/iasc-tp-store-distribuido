@@ -33,6 +33,7 @@ defmodule KVServer.Resolver do
   ## Server Callbacks
 
   def init(:ok) do
+    IO.puts ">>>> inicializa :resolver"
     {:ok, {Application.get_env(:kv_server, :dataStores), 0} }
   end
 
