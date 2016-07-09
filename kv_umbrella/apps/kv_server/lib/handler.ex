@@ -8,6 +8,11 @@ defmodule KVServer.Initializer do
     GenServer.start(__MODULE__, :ok, opts)
   end
 
+  def stop do
+    IO.puts "STOPINGGGGG"
+
+  end
+
     def stop(server) do
       GenServer.call server, :stop
     end
@@ -23,7 +28,6 @@ defmodule KVServer.Initializer do
   end
 
   def handle_call(:stop, _from, state) do
-    IO.puts "AAHAIAHIAHIHAIH"
     Plug.Adapters.Cowboy.shutdown KVServer.Handler.HTTP
     {:stop, :normal, state}
   end

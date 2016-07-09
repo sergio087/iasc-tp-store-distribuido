@@ -5,13 +5,13 @@ defmodule KVServer do
   # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
-    IO.puts "hola #{inspect _type}"
+    IO.puts "Inicializando Orchestrator en modo #{inspect _type}"
     
     children = [
       
       # Define workers and child supervisors to be supervised
       # worker(KVServer.Worker, [arg1, arg2, arg3]),
-      worker(__MODULE__.Initializer, [[name: {:global, GlobalPingPong}]], restart: :transient),
+      worker(__MODULE__.Initializer, [[name: :orchestrator]], restart: :transient),
       worker(__MODULE__.Resolver, [[name: :resolver]])
     ]
 
@@ -21,4 +21,5 @@ defmodule KVServer do
     Supervisor.start_link(children, opts)
   end
 
+  
 end
