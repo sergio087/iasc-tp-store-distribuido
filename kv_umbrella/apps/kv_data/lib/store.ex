@@ -1,6 +1,8 @@
 defmodule KVData.Store do
 	use GenServer
 
+  defstruct dictionary: %{}, max_size: 0  
+
 	def start_link do
     GenServer.start_link(__MODULE__, :ok, name: :store)
   end
@@ -21,11 +23,17 @@ defmodule KVData.Store do
 		GenServer.call :store, {:insert, key, value}
 	end
 
+  defp checkFreeSpace(state) do
+    (length (Map.keys state.dictionary)) < state.max_size
+  end
+
   ## Server Callbacks
 
   def init(:ok) do
   	IO.puts ">>>> inicializa :store"
-  	{:ok, %{}}
+    state = %__MODULE__{dictionary: %{}, max_size: Application.get_env(:kv_data, :max_size)}
+  	IO.puts inspect state
+    {:ok, state}
   end
 
   def handle_call({:state}, _from, state) do
@@ -33,9 +41,7 @@ defmodule KVData.Store do
   end
 
   def handle_call({:get, key}, _from, state) do
-    IO.puts inspect state
-    result = Map.get(state, key, nil)
-    IO.puts "#{key} => #{result}" 
+    result = Map.get(state.dictionary, key, nil)
     if result != nil do
       {:reply, {:found, result}, state}
     else
@@ -44,14 +50,18 @@ defmodule KVData.Store do
   end
 
   def handle_call({:find, fun}, _from, state) do
-    result = Enum.filter (Map.values state), fun 
+    result = Enum.filter (Map.values state.dictionary), fun 
 
     {:reply, result, state}
   end
 
   def handle_call({:insert, key, value}, _from, state) do
     #TODO validar capacidad maxima de claves a guardar
-  	{:reply, :ok, Map.put(state, key, value)}
+    if checkFreeSpace(state) do
+  	  {:reply, :ok, %__MODULE__{dictionary: Map.put(state.dictionary, key, value), max_size: state.max_size}}
+    else
+      {:reply, :not_enough_space, state}
+    end
   end
 
   def handle_info(_unknownmsg, state) do

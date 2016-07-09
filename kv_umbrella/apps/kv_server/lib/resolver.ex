@@ -71,7 +71,7 @@ defmodule KVServer.Resolver do
     	case writeOnStore(Enum.at(dataStores, new_index), key, value) do
         :ok ->
           %{:status => "ok"}
-        :full_store ->
+        :not_enough_space ->
           %{:status => "error", :detail => "the store is full"}
       end
   	
