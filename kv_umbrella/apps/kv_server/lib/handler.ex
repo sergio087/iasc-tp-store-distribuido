@@ -25,17 +25,24 @@ defmodule KVServer.Initializer do
     [currentport | tail] = Application.get_env(:kv_server, :ports)
     IO.puts "INICIALIZANDO"
     startServer({currentport, tail})
+   # receive do
   end
 
-  def handle_call(:stop, _from, state) do
+  def handle_cast(:stop, _from, state) do
+    IO.puts "LLAMO STOP"
     Plug.Adapters.Cowboy.shutdown KVServer.Handler.HTTP
     {:stop, :normal, state}
+  end
+
+  def terminate(_,_) do
+    IO.puts "TERMINATE" 
   end
 
   def startServer({currentport, tail}) do 
     case Plug.Adapters.Cowboy.http KVServer.Handler, [], [port: currentport] do
         {:ok, pid} ->
             IO.puts "Inicializado orchestrator en puerto: #{currentport}"
+            Process.link(pid)
             {:ok, pid}
         {:error, _} ->
             IO.puts "ERROR"
