@@ -14,14 +14,11 @@
 
 3. levantar cliente1
 
-	3.1 elegir modo del cliente: rpc o http 
+	(si queres rpc) /iasc-tp-store-distribuido/kv_umbrella/apps/kv_client$ ./run.sh client1 rpc
+	(si queres http) /iasc-tp-store-distribuido/kv_umbrella/apps/kv_client$ ./run.sh client1 http
 
-	(si queres http) `cp config.exs.http config.exs`
-	(si queres rpc) `cp config.exs.rpc config.exs`
 
-	3.2 ejecutarlo: 
-	
-	/iasc-tp-store-distribuido/kv_umbrella/apps/kv_client$ ./run.sh client1
+        verificar configuracion desde la consola iex: Application.get_all_env :kv_client
 
 
 4. consultas desde cliente1

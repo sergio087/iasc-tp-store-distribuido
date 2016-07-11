@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-	echo "Parameter Error! Use: ./run.sh client_name"
+if [ $# -ne 2 ]; then
+	echo "Parameter Error! Use: ./run.sh client_name [rpc|http]"
 	exit 1
 fi
 
-iex --name "${1}@127.0.0.1" -S mix
+iex --name "${1}@127.0.0.1" -S mix run --config ./config/config.exs.${2}
