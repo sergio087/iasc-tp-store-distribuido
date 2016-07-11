@@ -38,4 +38,8 @@
 
 	KVClient.Client.findGreater :client, "valor2"
 
+	KVClient.Client.remove :client, "clav1"
+
+	KVClient.Client.remove :client, "clav1"
+
 

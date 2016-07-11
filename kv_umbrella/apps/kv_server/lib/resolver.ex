@@ -9,13 +9,29 @@ defmodule KVServer.Resolver do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-
   def set_rpc(key, value) do 
     GenServer.call(:resolver, {:resolveSet, key, value})
   end
 
+  def get_rpc(key) do 
+    GenServer.call(:resolver, {:resolveGet, key})
+  end
+
+  def findGreater_rpc(value) do 
+    GenServer.call(:resolver, {:resolveFind, :gt, value})
+  end
+
+  def findSmaller_rpc(value) do 
+    GenServer.call(:resolver, {:resolveFind, :lt, value})
+  end
+
+  def remove_rpc(key) do 
+    GenServer.call(:resolver, {:resolveRemove, key})
+  end
+
 
   ##Private functions
+
   defp readOnStore(dataStore, :get, key) do
   	:rpc.call dataStore, KVData.Store, :get, [key]
   end
@@ -26,6 +42,10 @@ defmodule KVServer.Resolver do
 
   defp writeOnStore(dataStore, key, value) do
   	:rpc.call dataStore, KVData.Store, :insert, [key, value]
+  end
+
+  defp removeOnStore(dataStore, key) do
+    :rpc.call dataStore, KVData.Store, :remove, [key]
   end
 
   defp nextStore(state, key) do
@@ -48,7 +68,6 @@ defmodule KVServer.Resolver do
   end
 
   def handle_call({:resolveGet, key}, _from, state) do
-    #TODO aplicar hash para saber donde buscar
     response =
       if checkKeyLength(state,key) do 
         dataStore = nextStore state, key
@@ -91,6 +110,22 @@ defmodule KVServer.Resolver do
          %{:status => "error", :detail => "key too long"}
       end
 
+    {:reply, response, state}
+  end
+
+  def handle_call({:resolveRemove, key}, _from, state) do
+    response =
+      if checkKeyLength(state,key) do 
+        dataStore = nextStore state, key
+        case removeOnStore(dataStore, key) do
+          :ok -> 
+            %{:status => "ok"}
+          :not_found ->
+            %{:status => "error", :detail => "key not found"}
+        end
+      else
+        %{:status => "error", :detail => "Unexpected error"}
+      end 
     {:reply, response, state}
   end
 

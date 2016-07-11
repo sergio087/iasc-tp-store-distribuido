@@ -19,12 +19,12 @@ use GenServer
       GenServer.call server, {:get_rpc, key}
   end
 
-  def findGreater(server, key, value) do
-      GenServer.call server, {:findgreater_rpc, value}
+  def findGreater(server, value) do
+      GenServer.call server, {:findGreater_rpc, value}
   end
 
-  def findSmaller(server, key, value) do
-      GenServer.call server, {:findsmaller_rpc, value}
+  def findSmaller(server, value) do
+      GenServer.call server, {:findSmaller_rpc, value}
   end
   
   def remove(server, key) do
@@ -81,7 +81,7 @@ use GenServer
   end
   
   #Get
-  def handle_call({:get_rpc, key, value}, _from, [currentserver | _otherServers] = state) do
+  def handle_call({:get_rpc, key}, _from, [currentserver | _otherServers] = state) do
     IO.puts currentserver
     case :rpc.call currentserver, KVServer.Resolver, :get_rpc, [key] do
       {:badrpc, _} ->
@@ -93,9 +93,9 @@ use GenServer
   end
 
   #Find Greater
-  def handle_call({:findgreater_rpc, value}, _from, [currentserver | _otherServers] = state) do
+  def handle_call({:findGreater_rpc, value}, _from, [currentserver | _otherServers] = state) do
     IO.puts currentserver
-    case :rpc.call currentserver, KVServer.Resolver, :findgreater_rpc, [value] do
+    case :rpc.call currentserver, KVServer.Resolver, :findGreater_rpc, [value] do
       {:badrpc, _} ->
           {:reply, :error_no_master, changeserver(state)}
        response  ->
@@ -105,9 +105,9 @@ use GenServer
   end
 
    #Find Smaller
-  def handle_call({:findsmaller_rpc, value}, _from, [currentserver | _otherServers] = state) do
+  def handle_call({:findSmaller_rpc, value}, _from, [currentserver | _otherServers] = state) do
     IO.puts currentserver
-    case :rpc.call currentserver, KVServer.Resolver, :findsmaller_rpc, [value] do
+    case :rpc.call currentserver, KVServer.Resolver, :findSmaller_rpc, [value] do
       {:badrpc, _} ->
           {:reply, :error_no_master, changeserver(state)}
        response  ->

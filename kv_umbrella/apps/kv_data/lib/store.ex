@@ -23,6 +23,10 @@ defmodule KVData.Store do
 		GenServer.call :store, {:insert, key, value}
 	end
 
+  def remove(key) do
+    GenServer.call :store, {:remove, key}
+  end
+
   defp checkFreeSpace(state) do
     (length (Map.keys state.dictionary)) < state.max_size
   end
@@ -60,6 +64,15 @@ defmodule KVData.Store do
   	  {:reply, :ok, %__MODULE__{dictionary: Map.put(state.dictionary, key, value), max_size: state.max_size}}
     else
       {:reply, :not_enough_space, state}
+    end
+  end
+
+  def handle_call({:remove, key}, _from, state) do
+    result = Map.get(state.dictionary, key, nil)
+    if result != nil do
+      {:reply, :ok, %__MODULE__{dictionary: Map.delete(state.dictionary, key), max_size: state.max_size}}
+    else
+      {:reply, :not_found, state}
     end
   end
 
