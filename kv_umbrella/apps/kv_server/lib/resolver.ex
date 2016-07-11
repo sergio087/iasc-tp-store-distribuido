@@ -72,6 +72,8 @@ defmodule KVServer.Resolver do
       if checkKeyLength(state,key) do 
         dataStore = nextStore state, key
         case readOnStore(dataStore, :get, key) do
+          {:badrpc, _} ->
+            %{:status => "error", :detail => "data store comunication error"}
           {:found, result} -> 
             %{:status => "ok", :detail => result}
           :not_found ->
@@ -91,9 +93,28 @@ defmodule KVServer.Resolver do
 
 		tasks_with_results = Task.yield_many(tasks, 10000)
 
-		results = Enum.map(tasks_with_results, fn {task, res} -> res || Task.shutdown(task, :brutal_kill) end)
+		results = Enum.map(tasks_with_results, 
+      fn {task, res} ->
+         res || Task.shutdown(task, :brutal_kill) 
+      end)
+
     IO.puts "\n#{inspect results}"
-  	{:reply, (List.flatten(Enum.flat_map results, fn({x, y}) -> y end)), state}
+
+    flattenedResults = (List.flatten(Enum.flat_map results, 
+      fn({:ok, result}) ->
+        case result do
+          {:badrpc, _} -> [{:badrpc, "data node down" }]
+          x -> x
+        end 
+      end))
+
+    case List.keyfind(flattenedResults, :badrpc, 0) do 
+      {:badrpc, _ } ->
+        {:reply, %{:status => "error", :detail => "data store comunication error"}, state}
+      nil ->
+        {:reply, flattenedResults, state}
+    end
+  	
   end
 
   def handle_call({:resolveSet, key, value}, _from, state) do
@@ -101,6 +122,8 @@ defmodule KVServer.Resolver do
       if checkKeyLength(state,key) do
         dataStore = nextStore state, key
         	case writeOnStore(dataStore, key, value) do
+            {:badrpc, _} ->
+              %{:status => "error", :detail => "data store comunication error"}
             :ok ->
               %{:status => "ok"}
             :not_enough_space ->
@@ -118,6 +141,8 @@ defmodule KVServer.Resolver do
       if checkKeyLength(state,key) do 
         dataStore = nextStore state, key
         case removeOnStore(dataStore, key) do
+          {:badrpc, _} ->
+            %{:status => "error", :detail => "data store comunication error"}
           :ok -> 
             %{:status => "ok"}
           :not_found ->

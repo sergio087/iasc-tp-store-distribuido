@@ -22,9 +22,6 @@ defmodule KVServer.Handler do
     options
   end
 
-  def terminate(_, _) do 
-    IO.puts "TEMINANDO"  
- end
 
   match "/get", via: :get do
     IO.puts inspect conn
